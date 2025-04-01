@@ -1,3 +1,10 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+
+
 class Product {
   private String name;
   private Double price;
@@ -15,14 +22,14 @@ class Product {
 }
 
 class Sales {
-  private String product;
+  private String productName;
   private String date;
   private int qtySold;
   private Double totalPrice;
 
   //constructor
-  public Sales(String product, String date, int qtySold, Double totalPrice) {
-    this.product = product;
+  public Sales(String productName, String date, int qtySold, Double totalPrice) {
+    this.product = productName;
     this.date = date;
     this.qtySold = qtySold;
     this.totalPrice = totalPrice;
@@ -30,6 +37,9 @@ class Sales {
 }
 
 class InventoryManager {
+  ArrayList<product> products;
+  String FILE_NAME = "products.txt";
+
   public void updateStock() {
 }
 
@@ -37,18 +47,18 @@ public void lowStockLevels() {
 }
 }
 
-public class Main{
+public class Main {
+  private productsManager smartShop;
+  private JFrame frame;
+  private JTable productsTable;
+  private DefaultTableModel tableModel;
+
+  public Main() {
+    smartShop = new productManager();
+    shopGUI();
+  }
+
   public static void main(String[] args) {
-
-
-
-
-
-
-}
-
-
-
-
-
+    SwingUtilities.invokeLater(Main::new);
+  }
 }
