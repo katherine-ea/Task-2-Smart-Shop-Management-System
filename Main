@@ -36,7 +36,7 @@ class Sales {
 
 }
 
-class productsManager {
+class ProductsManager {
   ArrayList<product> products;
   String FILE_NAME = "products.txt";
 
