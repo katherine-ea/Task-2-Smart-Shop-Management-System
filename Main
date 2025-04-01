@@ -1,14 +1,40 @@
 class Product {
+  private String name;
+  private Double price;
+  private int stockQty;
+
+  //constructor
+  public Product(String name, Double price, int stockQty) {
+    this.name = name;
+    this.price = price;
+    this.stockQty = stockQty;
+}
+
   public void AddProduct() {
 }
 }
 
 class Sales {
+  private String product;
+  private String date;
+  private int qtySold;
+  private Double totalPrice;
+
+  //constructor
+  public Sales(String product, String date, int qtySold, Double totalPrice) {
+    this.product = product;
+    this.date = date;
+    this.qtySold = qtySold;
+    this.totalPrice = totalPrice;
 
 }
 
 class InventoryManager {
+  public void updateStock() {
+}
 
+public void lowStockLevels() {
+}
 }
 
 public class Main{
