@@ -42,6 +42,64 @@ class ProductsManager {
   String FILE_NAME = "products.txt";
 
   public void updateStock() {
+    JLabel nameLabel = new JLabel("Product Name:");
+		JLabel dateLabel = new JLabel("Date:");
+		JLabel qtyLabel = new JLabel("Qty:");
+		JLabel priceLabel = new JLabel("Price:");
+		
+		//examples of products to test the code
+		products.add("Jam");
+		products.add("Hot chocolate");
+		prices.add(12.50);
+		prices.add(2.00);
+		qtyTotal.add(4);
+		qtyTotal.add(12);
+		//products made from the add products page
+		String[] array = products.toArray(new String[products.size()]);
+		
+		//components
+    JComboBox<String> productsCombo = new JComboBox<>(array);
+		LocalDate todaysDate = LocalDate.now();
+		JTextField dateField = new JTextField(10);
+		dateField.setText("" + todaysDate);
+		JTextField qtyField = new JTextField(10);
+		JTextField priceField = new JTextField(10);
+		JButton addSale = new JButton("Add Sale");
+		productsCombo.addActionListener(e -> priceField.setText("" + prices.get(productsCombo.getSelectedIndex())) );
+		
+		//add components to JFrame
+		frame.add(panel);
+		panel.add(nameLabel);
+		panel.add(productsCombo);
+		frame.add(dateLabel);
+		frame.add(dateField);
+		frame.add(qtyLabel);
+		frame.add(qtyField);
+		frame.add(priceLabel);
+		frame.add(priceField);
+		frame.add(addSale);
+		
+		//add functionality to the add sales button
+		addSale.addActionListener(e -> {
+			System.out.println(qtyTotal);
+			
+			//get input of what product is picked
+	    	String pName = (String) productsCombo.getSelectedItem();
+	    	//get index of the product that is sold
+	    	int productIndex = products.indexOf(pName);
+	    	//get the same index for the quantity
+	    	int x = qtyTotal.get(productIndex);
+	    	//remove that quantity
+	    	qtyTotal.remove(productIndex);
+	    	int pQty = Integer.parseInt(qtyField.getText());
+	    	
+	    	//take away the quantity being bought from the original quantity
+	    	qtyTotal.add(productIndex,(x - pQty));
+	    	System.out.println(qtyTotal);
+	    	
+	    	
+		    	
+	    });
 }
 
 public void lowStockLevels() {
