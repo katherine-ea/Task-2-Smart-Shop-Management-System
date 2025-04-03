@@ -22,27 +22,22 @@ class Product {
 }
 
 class Sales {
-  private String productName;
-  private String date;
-  private int qtySold;
-  private Double totalPrice;
+	public static ArrayList<String> name;
+  	public static Date date;
+	public static int qty;
+	public static Double price;
+	public static ArrayList<String> products = new ArrayList<String>();
+	public static ArrayList<Double> prices = new ArrayList<Double>();
+	static ArrayList<Integer> qtyTotal = new ArrayList<Integer>();
+		
+	public Sales(ArrayList<String> name, Date date, int qty, Double price) {
+		this.name = name;
+		this.date = date;
+		this.qty = qty;
+		this.price = price;
+	}
 
-  //constructor
-  public Sales(String productName, String date, int qtySold, Double totalPrice) {
-    this.product = productName;
-    this.date = date;
-    this.qtySold = qtySold;
-    this.totalPrice = totalPrice;
-
-}
-}
-
-class ProductsManager {
-  ArrayList<product> products;
-  String FILE_NAME = "products.txt";
-
-  public void updateStock() {
-    JLabel nameLabel = new JLabel("Product Name:");
+		JLabel nameLabel = new JLabel("Product Name:");
 		JLabel dateLabel = new JLabel("Date:");
 		JLabel qtyLabel = new JLabel("Qty:");
 		JLabel priceLabel = new JLabel("Price:");
@@ -58,7 +53,7 @@ class ProductsManager {
 		String[] array = products.toArray(new String[products.size()]);
 		
 		//components
-    JComboBox<String> productsCombo = new JComboBox<>(array);
+    		JComboBox<String> productsCombo = new JComboBox<>(array);
 		LocalDate todaysDate = LocalDate.now();
 		JTextField dateField = new JTextField(10);
 		dateField.setText("" + todaysDate);
@@ -84,22 +79,30 @@ class ProductsManager {
 			System.out.println(qtyTotal);
 			
 			//get input of what product is picked
-	    	String pName = (String) productsCombo.getSelectedItem();
-	    	//get index of the product that is sold
-	    	int productIndex = products.indexOf(pName);
-	    	//get the same index for the quantity
-	    	int x = qtyTotal.get(productIndex);
-	    	//remove that quantity
-	    	qtyTotal.remove(productIndex);
-	    	int pQty = Integer.parseInt(qtyField.getText());
-	    	
-	    	//take away the quantity being bought from the original quantity
-	    	qtyTotal.add(productIndex,(x - pQty));
-	    	System.out.println(qtyTotal);
-	    	
+		    	String pName = (String) productsCombo.getSelectedItem();
+		    	//get index of the product that is sold
+		    	int productIndex = products.indexOf(pName);
+		    	//get the same index for the quantity
+		    	int x = qtyTotal.get(productIndex);
+		    	//remove that quantity
+		    	qtyTotal.remove(productIndex);
+		    	int pQty = Integer.parseInt(qtyField.getText());
+		    	
+		    	//take away the quantity being bought from the original quantity
+		    	qtyTotal.add(productIndex,(x - pQty));
+		    	System.out.println(qtyTotal);
+		    	
 	    	
 		    	
 	    });
+}
+
+class ProductsManager {
+  ArrayList<product> products;
+  String FILE_NAME = "products.txt";
+
+  public void updateStock() {
+    
 }
 
 public void lowStockLevels() {
