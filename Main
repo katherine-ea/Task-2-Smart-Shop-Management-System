@@ -17,7 +17,7 @@ class Product {
     this.stockQty = stockQty;
 }
 
-  public void AddProduct() {
+  public void addProduct() {
 }
 }
 
