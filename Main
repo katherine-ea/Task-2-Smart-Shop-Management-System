@@ -37,10 +37,45 @@ class Sales {
 		this.price = price;
 	}
 	public void recordSales(){
+		public static ArrayList<String> name;
+		public static Date date;
+		public static int qty;
+		public static Double price;
+		//products available
+		public static ArrayList<String> products = new ArrayList<String>();
+		//individual prices for each product
+		public static ArrayList<Double> prices = new ArrayList<Double>();
+		//total quantity
+		static ArrayList<Integer> qtyTotal = new ArrayList<Integer>();
+		//dates of purchases
+		static ArrayList<LocalDate> allDates = new ArrayList<LocalDate>();
+		//products that have a sale
+		static ArrayList<String> productsBought = new ArrayList<String>();
+		//total purchase amount for a sale
+		static ArrayList<Double> totalPurchases = new ArrayList<Double>();
+		public RecordSale(ArrayList<String> name, Date date, int qty, Double price) {
+			this.name = name;
+			this.date = date;
+			this.qty = qty;
+			this.price = price;
+		}
+
+		
+		//public static void main() {
+		JFrame frame = new JFrame();
+		
+		JPanel panel = new JPanel(new GridLayout(1, 4));
+		frame.setSize(600, 300);
+	    	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    	frame.setVisible(true);
+	    	frame.setTitle("Shop");
+		frame.setLayout(new FlowLayout());
+		
 		JLabel nameLabel = new JLabel("Product Name:");
 		JLabel dateLabel = new JLabel("Date:");
 		JLabel qtyLabel = new JLabel("Qty:");
 		JLabel priceLabel = new JLabel("Price:");
+		JLabel totalPriceLabel = new JLabel("Total Price:");
 		
 		//examples of products to test the code
 		products.add("Jam");
@@ -49,18 +84,23 @@ class Sales {
 		prices.add(2.00);
 		qtyTotal.add(4);
 		qtyTotal.add(12);
-		//products made from the add products page
+		
+		//products made from the 'add products' page
 		String[] array = products.toArray(new String[products.size()]);
 		
 		//components
-    		JComboBox<String> productsCombo = new JComboBox<>(array);
+        	JComboBox<String> productsCombo = new JComboBox<>(array);
 		LocalDate todaysDate = LocalDate.now();
 		JTextField dateField = new JTextField(10);
 		dateField.setText("" + todaysDate);
 		JTextField qtyField = new JTextField(10);
 		JTextField priceField = new JTextField(10);
 		JButton addSale = new JButton("Add Sale");
-		productsCombo.addActionListener(e -> priceField.setText("" + prices.get(productsCombo.getSelectedIndex())) );
+		productsCombo.addActionListener(e -> priceField.setText("" + prices.get(productsCombo.getSelectedIndex())));
+		JButton addPrice = new JButton("Total Price");
+		JTextField totalPrice = new JTextField(10);
+		
+		String quantityProduct = qtyField.getText();
 		
 		//add components to JFrame
 		frame.add(panel);
@@ -72,30 +112,125 @@ class Sales {
 		frame.add(qtyField);
 		frame.add(priceLabel);
 		frame.add(priceField);
+		frame.add(totalPriceLabel);
+		frame.add(totalPrice);
+		frame.add(addPrice);
 		frame.add(addSale);
 		
-		//add functionality to the add sales button
+		//add functionality to the 'add sales' button
 		addSale.addActionListener(e -> {
-			System.out.println(qtyTotal);
 			
-			//get input of what product is picked
-		    	String pName = (String) productsCombo.getSelectedItem();
-		    	//get index of the product that is sold
-		    	int productIndex = products.indexOf(pName);
-		    	//get the same index for the quantity
-		    	int x = qtyTotal.get(productIndex);
-		    	//remove that quantity
-		    	qtyTotal.remove(productIndex);
-		    	int pQty = Integer.parseInt(qtyField.getText());
-		    	
-		    	//take away the quantity being bought from the original quantity
-		    	qtyTotal.add(productIndex,(x - pQty));
-		    	System.out.println(qtyTotal);
-		    	
+			try {
+				System.out.println(qtyTotal);
+				//get input of what product is picked
+		    		String pName = (String) productsCombo.getSelectedItem();
+		    		//get index of the product that is sold
+		    		int productIndex = products.indexOf(pName);
+		    		//get the same index for the quantity
+		    		try {
+			    		int qtyEntered = Integer.parseInt(qtyField.getText());
+			    		if (qtyEntered > qtyTotal.get(productIndex)) {
+			    			//alerts user if the qty they ordered is higher than the available stock
+			    			JOptionPane.showMessageDialog(null, ("Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + "."));
+			    		
+			    			JOptionPane.showMessageDialog(null, ("Please enter a different quantity."));
+			    		}
+			    		else {
+			    			int x = qtyTotal.get(productIndex);
+				    		//remove that quantity
+				    		qtyTotal.remove(productIndex);
+				    		int pQty = Integer.parseInt(qtyField.getText());
+				    		//take away the quantity being bought from the original quantity
+				    		qtyTotal.add(productIndex,(x - pQty));
+			    		}
+		    		}	 
+		    		catch (NumberFormatException ee) {
+					JOptionPane.showMessageDialog(null, ("Please enter a number for the quantity."));
+		    		}
+	
+		    		System.out.println(qtyTotal);
+		    		Double overallPrice = prices.get(productsCombo.getSelectedIndex())*Double.parseDouble(qtyField.getText());
+		    		allDates.add(todaysDate);
+		    		productsBought.add(pName);
+		    		totalPurchases.add(overallPrice);
+			}
+			catch (Exception ee) {
+				JOptionPane.showMessageDialog(null, ("An error occured. Please try again."));
+			}
 	    	
 		    	
 	    });
+		
+		addPrice.addActionListener(e-> {
+			String pName = (String) productsCombo.getSelectedItem();
+	    		//get index of the product that is sold
+	    		int productIndex = products.indexOf(pName);
+			try {
+		    		int qtyEntered = Integer.parseInt(qtyField.getText());
+		    		totalPrice.setText("" + prices.get(productsCombo.getSelectedIndex())*Double.parseDouble(qtyField.getText()));
+		    		if (qtyEntered > qtyTotal.get(productIndex)) {
+		    			//alerts user if the qty they ordered is higher than the available stock
+		    			JOptionPane.showMessageDialog(null, ("Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + "."));
+		    			JOptionPane.showMessageDialog(null, ("Please enter a different quantity."));
+		    		}
+		    	
+	    		} catch (NumberFormatException ee) {
+				JOptionPane.showMessageDialog(null, ("Please enter a number for the quantity."));
+	    		}
+				
+			
+		});
+		
 }}
+	public void inventory() {
+		//arraylists for testing the table
+		static ArrayList<Integer> qtyTotal = new ArrayList<Integer>();
+		static ArrayList<LocalDate> allDates = new ArrayList<LocalDate>();
+		static ArrayList<String> productsBought = new ArrayList<String>();
+		static ArrayList<Double> totalPurchases = new ArrayList<Double>();
+	
+	    	//public static void main(String[] args) {
+	    	
+	        JFrame frame = new JFrame("JTable Example");
+	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        //making the column headers
+	        String col[] = {"Product Name", "Total Price", "Qty", "Date"};
+	        DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+	        JTable table = new JTable(tableModel);
+	      
+	        //data for testing
+	        productsBought.add("butter");
+	        productsBought.add("jam");
+	        totalPurchases.add(2.50);
+	        totalPurchases.add(6.00);
+	        qtyTotal.add(3);
+	        qtyTotal.add(88);
+	        allDates.add(LocalDate.now());
+	        allDates.add(LocalDate.now());
+	        productsBought.add("Hot chocolate");
+	        totalPurchases.add(8.00);
+	        qtyTotal.add(4);
+	        allDates.add(LocalDate.now());
+	        
+	        //adding rows to the table for each product bought
+	        	for (int i = 0; i < productsBought.size(); i++){
+	        		   String productName = productsBought.get(i);
+	        		   Double priceProduct = totalPurchases.get(i);
+	        		   int qtyProducts = qtyTotal.get(i);
+	        		   LocalDate todaysDate = allDates.get(i);
+	        		   Object[] data = {productName, priceProduct, qtyProducts, todaysDate};
+	        		   tableModel.addRow(data);
+	        	}
+	       
+	  
+	        JScrollPane scrollPane = new JScrollPane(table);
+	        frame.add(scrollPane);
+	        //disables editing
+	        table.setEnabled(false);
+	        frame.setSize(400, 300);
+	        frame.setVisible(true);
+    }}
+}
 
 class ProductsManager {
   ArrayList<product> products;
