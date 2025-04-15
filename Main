@@ -134,6 +134,10 @@ class Sales {
 			    			JOptionPane.showMessageDialog(null, ("Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + "."));
 			    		
 			    			JOptionPane.showMessageDialog(null, ("Please enter a different quantity."));
+			    		} 
+					//prevent negative quantities
+					else if (qtyEntered<=0) {
+			    			JOptionPane.showMessageDialog(null, ("The quantity must be more than 0."));
 			    		}
 			    		else {
 			    			int x = qtyTotal.get(productIndex);
@@ -173,7 +177,10 @@ class Sales {
 		    			JOptionPane.showMessageDialog(null, ("Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + "."));
 		    			JOptionPane.showMessageDialog(null, ("Please enter a different quantity."));
 		    		}
-		    	
+					//prevent negative quantities
+				else if (qtyEntered<=0) {
+			    		JOptionPane.showMessageDialog(null, ("The quantity must be more than 0."));
+			    	}		    	
 	    		} catch (NumberFormatException ee) {
 				JOptionPane.showMessageDialog(null, ("Please enter a number for the quantity."));
 	    		}
