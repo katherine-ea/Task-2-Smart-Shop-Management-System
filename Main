@@ -220,6 +220,9 @@ class Sales {
 	        		   LocalDate todaysDate = allDates.get(i);
 	        		   Object[] data = {productName, priceProduct, qtyProducts, todaysDate};
 	        		   tableModel.addRow(data);
+				 if (qtyProducts<5) {
+        			   JOptionPane.showMessageDialog(null, ("Warning! Less than 5 " + productName + " left!"));
+        		   }
 	        	}
 	       
 	  
