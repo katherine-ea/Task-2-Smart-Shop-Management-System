@@ -221,18 +221,47 @@ class Sales {
 	        allDates.add(LocalDate.now());
 	        
 	        //adding rows to the table for each product bought
-	        	for (int i = 0; i < productsBought.size(); i++){
-	        		   String productName = productsBought.get(i);
-	        		   Double priceProduct = totalPurchases.get(i);
-	        		   int qtyProducts = qtyTotal.get(i);
-	        		   LocalDate todaysDate = allDates.get(i);
-	        		   Object[] data = {productName, priceProduct, qtyProducts, todaysDate};
-	        		   tableModel.addRow(data);
-				 if (qtyProducts<5) {
+        	for (int i = 0; i < productsBought.size(); i++){
+        		   String productName = productsBought.get(i);
+        		   Double priceProduct = totalPurchases.get(i);
+        		   int qtyProducts = qtyTotal.get(i);
+        		   LocalDate todaysDate = allDates.get(i);
+        		   Object[] data = {productName, priceProduct, qtyProducts, todaysDate};
+        		   tableModel.addRow(data);
+        		   //warning for low stock
+        		   if (qtyProducts<5) {
         			   JOptionPane.showMessageDialog(null, ("Warning! Less than 5 " + productName + " left!"));
         		   }
-	        	}
-	       
+        	}
+        	
+        	//change colour of row depending on stock levels
+        	table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+           	    @Override
+           	    public Component getTableCellRendererComponent(JTable table,
+           	            Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+           	        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+           	        //get row of data depending on column data
+           	        int status = (Integer)table.getModel().getValueAt(row, QTY_COL);
+           	        
+           	        	
+	           	        if (status<5) {
+	           	        	//if urgently needs more stock
+	           	            setBackground(Color.decode("#B30000"));
+	           	            setForeground(Color.WHITE);
+	           	        //if maybe needs more stock
+	           	        } else if (status<10 && status>5){
+	           	        	setBackground(Color.decode("#FFAE00"));
+	           	            setForeground(Color.BLACK);
+	           	        //if a good amount of stock
+	           	        }else {
+	           	            setBackground(Color.decode("#00FF11"));
+	           	            setForeground(Color.BLACK);
+	           	        }       
+	           	        return this;
+           	    }
+           	});
+
 	  
 	        JScrollPane scrollPane = new JScrollPane(table);
 	        frame.add(scrollPane);
