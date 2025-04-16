@@ -146,6 +146,7 @@ class Sales {
 				    		int pQty = Integer.parseInt(qtyField.getText());
 				    		//take away the quantity being bought from the original quantity
 				    		qtyTotal.add(productIndex,(x - pQty));
+						JOptionPane.showMessageDialog(null, ("Sale added!"));
 			    		}
 		    		}	 
 		    		catch (NumberFormatException ee) {
