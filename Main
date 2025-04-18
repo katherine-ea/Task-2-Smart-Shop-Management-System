@@ -74,8 +74,8 @@ class Sales {
 		JLabel nameLabel = new JLabel("Product Name:");
 		JLabel dateLabel = new JLabel("Date:");
 		JLabel qtyLabel = new JLabel("Qty:");
-		JLabel priceLabel = new JLabel("Price:");
-		JLabel totalPriceLabel = new JLabel("Total Price:");
+		JLabel priceLabel = new JLabel("Price:  £");
+		JLabel totalPriceLabel = new JLabel("Total Price:  £");
 		
 		//examples of products to test the code
 		products.add("Jam");
