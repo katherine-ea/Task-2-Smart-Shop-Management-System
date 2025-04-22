@@ -5,7 +5,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.util.Date;
-
+import java.awt.event.ActionEvent;
+import java.nio.file.*;
+import java.util.*;
+import java.util.List;
 
 
 //----MANAGE PRODUCTS PAGE----
@@ -212,6 +215,170 @@ public class Main {
     }
 
 //----END OF MANAGE PRODUCTS PAGE----
+
+
+
+
+//----GENERATE REPORT PAGE----
+public class Main extends JFrame {
+
+    private graphPanel graphPanel;
+    private JLabel salesLabel;
+    private JLabel productsLabel;
+
+    public Main() {
+        setTitle("Generate Report");
+        setSize(800, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        //right panel
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        rightPanel.setPreferredSize(new Dimension(400, 500));
+
+        JButton generateButton = new JButton("Generate Report");
+        generateButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        generateButton.addActionListener(this::generateReport);
+
+        graphPanel = new graphPanel();
+        graphPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        salesLabel = new JLabel("Total Sales: ");
+        productsLabel = new JLabel("Total Products: ");
+        salesLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        productsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        salesLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        productsLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        rightPanel.add(generateButton);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        rightPanel.add(graphPanel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        rightPanel.add(salesLabel);
+        rightPanel.add(productsLabel);
+
+        add(rightPanel, BorderLayout.EAST);
+    }
+
+    private void generateReport(ActionEvent e) {
+        Map<String, Integer> productSales = countProductSales("sales.txt");
+        int totalProducts = countNonEmptyLines("products.txt");
+        int totalSales = productSales.values().stream().mapToInt(Integer::intValue).sum();
+
+        graphPanel.setData(productSales);
+        salesLabel.setText("Total Sales: " + totalSales);
+        productsLabel.setText("Total Products: " + totalProducts);
+
+        graphPanel.repaint();
+    }
+
+    private Map<String, Integer> countProductSales(String fileName) {
+        Map<String, Integer> productSales = new LinkedHashMap<>();
+        try {
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) return productSales;
+
+            List<String> lines = Files.readAllLines(path);
+            for (String line : lines) {
+                String product = line.trim();
+                if (!product.isEmpty()) {
+                    productSales.put(product, productSales.getOrDefault(product, 0) + 1);
+                }
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error reading file: " + fileName,
+                    "File Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return productSales;
+    }
+
+    private int countNonEmptyLines(String fileName) {
+        try {
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) return 0;
+
+            List<String> lines = Files.readAllLines(path);
+            return (int) lines.stream().filter(line -> !line.trim().isEmpty()).count();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error reading file: " + fileName,
+                    "File Error", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new Main().setVisible(true);
+        });
+    }
+}
+
+//panel to draw the bars
+class graphPanel extends JPanel {
+    private Map<String, Integer> data = new LinkedHashMap<>();
+    public graphPanel() {
+        setPreferredSize(new Dimension(500, 300));
+    }
+    public void setData(Map<String, Integer> data) {
+        this.data = data;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (data == null || data.isEmpty()) {
+            return;
+        }
+
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+        int width = getWidth();
+        int height = getHeight();
+
+        int maxVal = Collections.max(data.values());
+        int barWidth = 40;
+        int spacing = 20;
+        int x = 60;
+
+        //graph title
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+        g2.drawString("Graph to show how many sales per product", 15, 20);
+        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        //y-axis label
+        g2.drawString("Number", 0, 200);
+        g2.drawString("Sold", 0, 210);
+
+        //bars
+        for (Map.Entry<String, Integer> entry : data.entrySet()) {
+            String label = entry.getKey();
+            int value = entry.getValue();
+            int barHeight = (int) ((double) value / maxVal * (height - 100));
+
+            g2.setColor(new Color(149, 195, 204));
+            g2.fillRect(x, height - barHeight - 30, barWidth, barHeight);
+
+            //label bars
+            g2.setColor(Color.BLACK);
+            g2.drawString(label, x, height - 10);
+            g2.drawString(String.valueOf(value), x + 10, height - barHeight - 35);
+
+            x += barWidth + spacing;
+        }
+
+        //x-axis label
+        g2.drawString("Products", width / 2 - 30, height - -1);
+    }
+}
+
+//----END OF GENERATE REPORT PAGE----
+
+
+
+
 
 
 class Sales {
