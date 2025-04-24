@@ -663,3 +663,50 @@ public class Main {
     SwingUtilities.invokeLater(Main::new);
   }
 }
+
+// button indicators 
+import javax.swing.*;
+import java.awt.*;
+
+public class Main{
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
+        frame.setSize(600, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setLayout(new FlowLayout());
+        JButton manageProducts = new JButton("Manage Products");
+        JButton recordSale = new JButton("Record Sale");
+        JButton inventory = new JButton("Inventory");
+        JButton generateReport = new JButton("Generate Report");
+
+
+        frame.add(manageProducts);
+        frame.add(recordSale);
+        frame.add(inventory);
+        frame.add(generateReport);
+
+        manageProducts.addActionListener(e -> {
+            System.out.println("Manage Products");
+            Product taskManage=();
+            taskManage.addProduct();
+        });
+        recordSale.addActionListener(e -> {
+            System.out.println("Record Sale");
+            sale tasksale=();
+            tasksale.addsale();
+        });
+        inventory.addActionListener(e -> {
+            System.out.println("Inventory");
+            Inventory taskInventory=();
+            taskInventory.addinventory();
+        });
+        generateReport.addActionListener(e -> {
+            System.out.println("Generate Report");
+            report taskreport=();
+            taskreport.addreport();
+        });
+
+
+    }
+}
