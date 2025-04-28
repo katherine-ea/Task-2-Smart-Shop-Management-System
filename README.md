@@ -9,7 +9,7 @@ A small window will pop-up opening the application, within this you can use the 
 Altering the code will make the application fail and unusable so DO NOT CHANGE THE CODE!
 
 Finding the right application to run the file;
-When creating this file we used Intelij verstion 2024.3.2.2 so when finding an application please use this version or a newwer version.
+When creating this file we used Intelij verstion 2024.3.2.2 so when finding an application please use this version or a newer version.
 
 Imports used 
 import javax.swing.*;
@@ -25,6 +25,12 @@ import java.util.List;
 
 
 Key features implemented 
+- adding a sale
+- adding a product
+- displaying sale records
+- displaying product records
+- generates report
+- stores a record of products and sales in a .txt file
 
 
 
