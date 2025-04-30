@@ -14,6 +14,7 @@ Finding the right application to run the file;
 - When creating this file we used Intelij verstion 2024.3.2.2 so when finding an application please use this version or a newer version.
 
 
+
 Imports used:
 
 -- Swing --
@@ -41,6 +42,7 @@ Imports used:
 - import java.util.*;
 - import java.util.List;
 - import java.util.Scanner;
+
 
 
 Key features implemented 
