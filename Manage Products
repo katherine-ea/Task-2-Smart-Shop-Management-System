@@ -1,0 +1,210 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+
+//product class
+class Product {
+    private String prodName;
+    private Double prodPrice;
+    private int prodStockQty;
+
+    public Product(String name, Double price, int stockQty) {
+        this.prodName = name;
+        this.prodPrice = price;
+        this.prodStockQty = stockQty;
+    }
+
+    public String getName() {return prodName;}
+    public Double getPrice() {return prodPrice;}
+    public int getQty() {return prodStockQty;}
+
+    //adds product attributes to string
+    @Override
+    public String toString() {
+        return prodName + "," + prodPrice + "," + prodStockQty;
+    }
+
+    public static Product fromString(String productString) {
+        String[] parts = productString.split(",");
+        if (parts.length != 3) return null;
+        try {
+            String name = parts[0];
+            Double price = Double.parseDouble(parts[1]);
+            int qty = Integer.parseInt(parts[2]);
+            return new Product(name, price, qty);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+//products manager
+class ProductsManager {
+    private ArrayList<Product> products;
+    private static final String FILE_NAME = "products.txt";
+
+    public ProductsManager() {
+        this.products = new ArrayList<>();
+        loadProducts();
+    }
+
+    public void addProduct(Product product) {
+        products.add(product);
+        saveProducts();
+    }
+
+    public void deleteProduct(int index) {
+        if (index >= 0 && index < products.size()) {
+            products.remove(index);
+            saveProducts();
+        }
+    }
+
+    public ArrayList<Product> getProducts() {
+        return products;
+    }
+
+    private void saveProducts() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
+            for (Product product : products) {
+                writer.println(product.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadProducts() {
+        products.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Product product = Product.fromString(line);
+                if (product != null) {
+                    products.add(product);
+                }
+            }
+        }
+        catch (IOException e) {
+            products = new ArrayList<>();
+        }
+    }
+}
+
+//GUI
+public class ManageProducts {
+    private ProductsManager smartShop;
+    private JFrame frame;
+    private JTable productsTable;
+    private DefaultTableModel tableModel;
+
+    public ManageProducts() {
+        smartShop = new ProductsManager();
+        shopGUI();
+    }
+
+    public void shopGUI() {
+        frame = new JFrame("Smart Shop");
+        frame.setSize(800, 500);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 200, 0, 20));
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Add New Product"));
+
+        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField(10);
+        row1.add(nameLabel);
+        row1.add(nameField);
+
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel priceLabel = new JLabel("Price:");
+        JTextField priceField = new JTextField(8);
+        row2.add(priceLabel);
+        row2.add(priceField);
+
+        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel qtyLabel = new JLabel("Qty:");
+        JTextField qtyField = new JTextField(5);
+        row3.add(qtyLabel);
+        row3.add(qtyField);
+
+        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton addButton = new JButton("Add Product");
+        row4.add(addButton);
+
+        JPanel row5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton deleteButton = new JButton("Delete Selected Product");
+        row5.add(deleteButton);
+
+        inputPanel.add(row1);
+        inputPanel.add(row2);
+        inputPanel.add(row3);
+        inputPanel.add(row4);
+        inputPanel.add(row5);
+
+        tableModel = new DefaultTableModel(new String[]{"Name", "Price", "Quantity"}, 0);
+        productsTable = new JTable(tableModel);
+        refreshProductList();
+
+        JScrollPane tableScrollPane = new JScrollPane(productsTable);
+        tableScrollPane.setBorder(BorderFactory.createTitledBorder("Product List"));
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.add(inputPanel);
+        rightPanel.add(Box.createVerticalStrut(10));
+        rightPanel.add(tableScrollPane);
+
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
+        frame.getContentPane().add(mainPanel);
+        frame.setResizable(false);
+        frame.setVisible(true);
+
+        addButton.addActionListener(e -> {
+            String name = nameField.getText().trim();
+            String price = priceField.getText().trim();
+            String qty = qtyField.getText().trim();
+
+            if (name.isEmpty() || price.isEmpty() || qty.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                double priceVal = Double.parseDouble(price);
+                int qtyVal = Integer.parseInt(qty);
+                smartShop.addProduct(new Product(name, priceVal, qtyVal));
+                refreshProductList();
+                nameField.setText(""); priceField.setText(""); qtyField.setText("");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Price and Quantity must be numbers!", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        deleteButton.addActionListener(e -> {
+            int selectedRow = productsTable.getSelectedRow();
+            if (selectedRow != -1) {
+                smartShop.deleteProduct(selectedRow);
+                refreshProductList();
+            }
+        });
+    }
+
+    private void refreshProductList() {
+        tableModel.setRowCount(0);
+        for (Product product : smartShop.getProducts()) {
+            tableModel.addRow(new Object[]{product.getName(), product.getPrice(), product.getQty()});
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(ManageProducts::new);
+    }
+}
