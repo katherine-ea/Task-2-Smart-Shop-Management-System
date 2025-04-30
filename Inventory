@@ -34,7 +34,6 @@ public class Inventory {
                 productsBought.add(parsedInput);
 
 
-                //String [] qtyInput = s.nextLine().split(",");
                 Integer parsedQty = Integer.parseInt(input[2]);
                 qtyTotal.add(parsedQty);
 
