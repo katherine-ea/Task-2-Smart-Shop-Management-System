@@ -17,30 +17,30 @@ Finding the right application to run the file;
 Imports used:
 
 -- Swing --
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
+- import javax.swing.*;
+- import javax.swing.table.DefaultTableModel;
+- import javax.swing.table.DefaultTableCellRenderer;
 
 -- AWT --
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.FlowLayout;
+- import java.awt.*;
+- import java.awt.event.ActionEvent;
+- import java.awt.FlowLayout;
 
 -- File handling --
-import java.io.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.*;
+- import java.io.*;
+- import java.io.File;
+- import java.io.FileNotFoundException;
+- import java.io.FileWriter;
+- import java.io.IOException;
+- import java.nio.file.*;
 
 -- Date and time --
-import java.time.LocalDate;
+- import java.time.LocalDate;
 
 -- Utilities --
-import java.util.*;
-import java.util.List;
-import java.util.Scanner;
+- import java.util.*;
+- import java.util.List;
+- import java.util.Scanner;
 
 
 Key features implemented 
