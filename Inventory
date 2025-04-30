@@ -1,0 +1,95 @@
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import javax.swing.JFrame;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
+public class Inventory {
+
+    //arraylists for testing the table
+    static ArrayList<Integer> qtyTotal = new ArrayList<Integer>();
+    static ArrayList<String> productsBought = new ArrayList<String>();
+    static ArrayList<Double> totalPurchases = new ArrayList<Double>();
+    private static final int QTY_COL = 2;
+    public void inventoryTable(){
+
+        JFrame frame = new JFrame("JTable Example");
+        //making the column headers
+        String col[] = {"Product Name", "Total Price", "Qty"};
+        DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+        JTable table = new JTable(tableModel);
+
+
+        //data for testing
+        try(Scanner s = new Scanner(new File("products.txt"))) {
+            while (s.hasNextLine()) {
+
+                String [] input = s.nextLine().split(",");
+                String parsedInput = input[0];
+                productsBought.add(parsedInput);
+
+
+                //String [] qtyInput = s.nextLine().split(",");
+                Integer parsedQty = Integer.parseInt(input[2]);
+                qtyTotal.add(parsedQty);
+
+
+                Double parsedPrice = Double.parseDouble(input[1]);
+                totalPurchases.add(parsedPrice);
+            }}
+        catch (IOException e) {
+        }
+
+        //adding rows to the table for each product bought
+        for (int i = 0; i < productsBought.size(); i++){
+            String productName = productsBought.get(i);
+            Double priceProduct = totalPurchases.get(i);
+            int qtyProducts = qtyTotal.get(i);
+            Object[] data = {productName, priceProduct, qtyProducts};
+            tableModel.addRow(data);
+            //warning for low stock
+            if (qtyProducts<5) {
+                JOptionPane.showMessageDialog(null, ("Warning! Less than 5 " + productName + " left!"));
+            }
+        }
+
+        //change colour of row depending on stock levels
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                //get row of data depending on column data
+                int status = (Integer)table.getModel().getValueAt(row, QTY_COL);
+
+
+                if (status<=5) {
+                    //low stock
+                    setBackground(Color.decode("#B30000"));
+                    setForeground(Color.WHITE);
+                    //medium stock
+                } else if (status<=10 && status>=6){
+                    setBackground(Color.decode("#FFAE00"));
+                    setForeground(Color.BLACK);
+                    //high stock
+                } else {
+                    setBackground(Color.decode("#00FF11"));
+                    setForeground(Color.BLACK);
+                }
+                return this;
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane);
+        //disables editing
+        table.setEnabled(false);
+        frame.setSize(400, 300);
+        frame.setVisible(true);
+    }
+}
