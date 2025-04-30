@@ -13,17 +13,34 @@ HOW TO USE
 Finding the right application to run the file;
 - When creating this file we used Intelij verstion 2024.3.2.2 so when finding an application please use this version or a newer version.
 
-Imports used 
-- import javax.swing.*;
-- import java.swing.table.DefaultTableModel;
-- import java.awt.*;
-- import java.io.*;
-- import java.util.ArrayList;
-- import java.util.Date;
-- import java.awt.event.ActionEvent;
-- import java.nio.file.*;
-- import java.util.*;
-- import java.util.List;
+
+Imports used:
+
+-- Swing --
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+
+-- AWT --
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.FlowLayout;
+
+-- File handling --
+import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.*;
+
+-- Date and time --
+import java.time.LocalDate;
+
+-- Utilities --
+import java.util.*;
+import java.util.List;
+import java.util.Scanner;
 
 
 Key features implemented 
@@ -33,9 +50,3 @@ Key features implemented
 - displaying product records
 - generates a report including a bar chart
 - stores a record of products and sales in sales.txt and products.txt text files
-
-
-
-
-
-
