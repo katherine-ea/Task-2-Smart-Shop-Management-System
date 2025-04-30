@@ -1,0 +1,219 @@
+import java.awt.FlowLayout;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.*;
+import javax.swing.*;
+
+public class SalesRecord {
+    public static ArrayList<String> name;
+    public static Date date;
+    public static int qty;
+    public static Double price;
+
+    //products available
+    public static ArrayList<String> products = new ArrayList<>();
+    public static ArrayList<Double> prices = new ArrayList<>();
+    public static ArrayList<Integer> qtyTotal = new ArrayList<>();
+
+    //sales tracking
+    public static ArrayList<LocalDate> allDates = new ArrayList<>();
+    public static ArrayList<String> productsBought = new ArrayList<>();
+    public static ArrayList<Double> totalPurchases = new ArrayList<>();
+
+    public SalesRecord(ArrayList<String> name, Date date, int qty, Double price) {
+        SalesRecord.name = name;
+        SalesRecord.date = date;
+        SalesRecord.qty = qty;
+        SalesRecord.price = price;
+    }
+
+    public static void StoreSales() {
+        JFrame frame = new JFrame();
+        JLabel nameLabel = new JLabel("Product Name:");
+        JLabel dateLabel = new JLabel("Date:");
+        JLabel qtyLabel = new JLabel("Qty:");
+        JLabel priceLabel = new JLabel("Price:  £");
+        JLabel totalPriceLabel = new JLabel("Total Price:  £");
+
+        ArrayList<String> comboList = new ArrayList<>();
+        try (Scanner s = new Scanner(new File("products.txt"))) {
+            while (s.hasNextLine()) {
+                String[] input = s.nextLine().split(",");
+                String parsedInput = input[0];
+                comboList.add(parsedInput);
+                products.add(parsedInput);
+
+                Double parsedPrice = Double.parseDouble(input[1]);
+                prices.add(parsedPrice);
+
+                Integer parsedQty = Integer.parseInt(input[2]);
+                qtyTotal.add(parsedQty);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String[] array = comboList.toArray(new String[0]);
+
+        JComboBox<String> productsCombo = new JComboBox<>(array);
+        LocalDate todaysDate = LocalDate.now();
+        JTextField dateField = new JTextField(10);
+        dateField.setText("" + todaysDate);
+        JTextField qtyField = new JTextField(10);
+        JTextField priceField = new JTextField(10);
+        JButton addSale = new JButton("Add Sale");
+        JButton addPrice = new JButton("Total Price");
+        JTextField totalPrice = new JTextField(10);
+
+        productsCombo.addActionListener(e -> priceField.setText("" + prices.get(productsCombo.getSelectedIndex())));
+
+        frame.add(nameLabel);
+        frame.add(productsCombo);
+        frame.add(dateLabel);
+        frame.add(dateField);
+        frame.add(qtyLabel);
+        frame.add(qtyField);
+        frame.add(priceLabel);
+        frame.add(priceField);
+        frame.add(totalPriceLabel);
+        frame.add(totalPrice);
+        frame.add(addPrice);
+        frame.add(addSale);
+
+        addSale.addActionListener(e -> {
+            try {
+                String pName = (String) productsCombo.getSelectedItem();
+                int productIndex = products.indexOf(pName);
+                int qtyEntered = Integer.parseInt(qtyField.getText());
+
+                if (qtyEntered > qtyTotal.get(productIndex)) {
+                    JOptionPane.showMessageDialog(null, "Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + ".");
+                } else if (qtyEntered <= 0) {
+                    JOptionPane.showMessageDialog(null, "The quantity must be more than 0.");
+                } else if (qtyTotal.get(productIndex) == 0) {
+                    JOptionPane.showMessageDialog(null, "This item is currently out of stock.");
+                } else {
+                    //updates quantity
+                    int x = qtyTotal.get(productIndex);
+                    qtyTotal.set(productIndex, x - qtyEntered);
+
+                    //records in sales.txt
+                    String salesPath = "sales.txt";
+                    try (FileWriter fw = new FileWriter(salesPath, true)) {
+                        fw.write(pName + "," + qtyEntered + "\n");
+                    } catch (IOException ee) {
+                        ee.printStackTrace();
+                    }
+
+                    //updates products.txt
+                    updateProductQuantitiesFromSales();
+
+                    //updates sales counting
+                    Double overallPrice = prices.get(productIndex) * qtyEntered;
+                    allDates.add(todaysDate);
+                    productsBought.add(pName);
+                    totalPurchases.add(overallPrice);
+
+                    JOptionPane.showMessageDialog(null, "Sale added!");
+                }
+            } catch (NumberFormatException ee) {
+                JOptionPane.showMessageDialog(null, "Please enter a number for the quantity.");
+            } catch (Exception ee) {
+                JOptionPane.showMessageDialog(null, "An error occurred. Please try again.");
+            }
+        });
+
+        addPrice.addActionListener(e -> {
+            try {
+                String pName = (String) productsCombo.getSelectedItem();
+                int productIndex = products.indexOf(pName);
+                int qtyEntered = Integer.parseInt(qtyField.getText());
+
+                if (qtyEntered > qtyTotal.get(productIndex)) {
+                    JOptionPane.showMessageDialog(null, "Not enough stock. The remaining stock for this item is " + qtyTotal.get(productIndex) + ".");
+                } else if (qtyEntered <= 0) {
+                    JOptionPane.showMessageDialog(null, "The quantity must be more than 0.");
+                } else {
+                    double total = prices.get(productIndex) * qtyEntered;
+                    totalPrice.setText("" + total);
+                }
+            } catch (NumberFormatException ee) {
+                JOptionPane.showMessageDialog(null, "Please enter a number for the quantity.");
+            }
+        });
+
+        frame.setSize(800, 500);
+        frame.setTitle("Shop");
+        frame.setLayout(new FlowLayout());
+        frame.setVisible(true);
+    }
+
+    public static void updateProductQuantitiesFromSales() {
+        ArrayList<String> updatedProductLines = new ArrayList<>();
+        HashMap<String, Integer> productQtyMap = new HashMap<>();
+
+        //reads products.txt
+        try (Scanner productScanner = new Scanner(new File("products.txt"))) {
+            while (productScanner.hasNextLine()) {
+                String[] parts = productScanner.nextLine().split(",");
+                if (parts.length < 3) continue;
+                String name = parts[0];
+                int qty = Integer.parseInt(parts[2]);
+                productQtyMap.put(name, qty);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        //reads sales.txt and counts total sales
+        HashMap<String, Integer> totalSalesMap = new HashMap<>();
+        try (Scanner salesScanner = new Scanner(new File("sales.txt"))) {
+            while (salesScanner.hasNextLine()) {
+                String[] parts = salesScanner.nextLine().split(",");
+                if (parts.length < 2) continue;
+                String product = parts[0];
+                int soldQty = Integer.parseInt(parts[1]);
+                totalSalesMap.put(product, totalSalesMap.getOrDefault(product, 0) + soldQty);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        //combines and create updated lines
+        try (Scanner productScanner = new Scanner(new File("products.txt"))) {
+            while (productScanner.hasNextLine()) {
+                String[] parts = productScanner.nextLine().split(",");
+                if (parts.length < 3) continue;
+                String name = parts[0];
+                double price = Double.parseDouble(parts[1]);
+                int originalQty = Integer.parseInt(parts[2]);
+                int soldQty = totalSalesMap.getOrDefault(name, 0);
+                int updatedQty = Math.max(0, originalQty - soldQty);
+                updatedProductLines.add(name + "," + price + "," + updatedQty);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        //updates products text file
+        try (FileWriter fw = new FileWriter("products.txt", false)) {
+            for (String line : updatedProductLines) {
+                fw.write(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("products.txt updated");
+    }
+
+    public static void main(String[] args) {
+        StoreSales();
+    }
+}
